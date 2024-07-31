@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  date        DateTime
+  price       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Spot        Spot[]
+
+  @@map("event")
+}
+
+enum SpotStatus {
+  available
+  reserved
+}
+
+model Spot {
+  id        String     @id @default(uuid())
+  name      String
+  eventId   String
+  status    SpotStatus
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  Event Event @relation(fields: [eventId], references: [id])
+
+  @@map("spot")
+}
